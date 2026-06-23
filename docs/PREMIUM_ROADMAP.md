@@ -9,10 +9,11 @@ Setiap fitur yang akan kita bangun dipetakan langsung dengan bab-bab krusial di 
 ## 1. NestJS Fundamentals (Konsep Dasar)
 Membangun fondasi aplikasi yang solid dan memahami siklus request-response (Request Lifecycle) di NestJS.
 
-- [ ] **Custom Providers & Dynamic Modules**: Memperdalam cara kerja `DatabaseModule` menggunakan injeksi dependensi tingkat lanjut.
-- [ ] **Middleware**: Membuat `LoggerMiddleware` untuk mencatat setiap *request* (URL, IP, dan durasi eksekusi) sebelum masuk ke Controller.
-- [ ] **Exception Filters**: Mengimplementasikan *Global Exception Filter* untuk menyeragamkan format *error* di seluruh aplikasi.
-- [ ] **Pipes**: Memperdalam validasi dan transformasi data. (Sudah kita mulai dengan `ValidationPipe` & `ParseIntPipe`).
+- [x] **Custom Providers & Dynamic Modules**: Menggunakan injeksi dependensi tingkat lanjut dengan `useFactory` (Sudah diterapkan pada `DatabaseModule` & `ConfigModule`).
+- [x] **Interceptors**: Menerapkan Global Interceptor untuk mencegat response dan menyeragamkan strukturnya menjadi `{ data: ... }` (Sudah diterapkan via `TransformInterceptor`).
+- [x] **Middleware**: Membuat `LoggerMiddleware` untuk mencatat setiap *request* (URL, IP, dan durasi eksekusi) sebelum masuk ke Controller.
+- [x] **Exception Filters**: Mengimplementasikan *Global Exception Filter* untuk menyeragamkan format *error* di seluruh aplikasi.
+- [x] **Pipes**: Validasi dan transformasi payload. (Sudah diterapkan secara global dengan `ValidationPipe` dari `class-validator` & `ParseIntPipe`).
 - [ ] **Guards**: Membuat `AuthGuard` untuk membatasi akses API hanya untuk user yang sudah login.
 - [ ] **Custom Decorators**: Membuat dekorator seperti `@CurrentUser()` untuk mempermudah pengambilan data user dari object *request*.
 
@@ -44,7 +45,8 @@ Menambahkan fitur-fitur "Super" yang kompleks ke dalam Todo List.
 - [ ] **End-to-End (E2E) Testing**: Menggunakan `Supertest` untuk menyimulasikan *request* HTTP langsung dari Controller hingga ke Database secara keseluruhan.
 
 ## 7. Database (ORM Migration)
-- [ ] Memahami siklus pengembangan data: Dari **SQLite** untuk lokal, menuju setup dan migrasi skema menggunakan Drizzle ORM ke **PostgreSQL** di _Production_.
+- [x] Setup dasar menggunakan **SQLite** (`better-sqlite3`) dan **Drizzle ORM** untuk lingkungan lokal.
+- [ ] Melakukan migrasi skema dan koneksi ke database **PostgreSQL** di _Production_.
 
 ---
 Dengan menyelesaikan rute di atas satu per satu, kamu tidak hanya akan memiliki aplikasi SaaS Todo List Premium, tetapi juga pemahaman komprehensif (A-Z) tentang cara kerja framework **NestJS** di industri nyata.
