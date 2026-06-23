@@ -1,30 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { Todo } from './entities/todo.entity';
+import { DATABASE_CONNECTION } from '../../database/database.module';
+import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { eq } from 'drizzle-orm';
+import { todos } from './schema/todo.schema';
+import * as schema from './schema/todo.schema';
 
 @Injectable()
 export class TodoService {
-  private readonly todos: Todo[] = [];
-  private idCounter = 1;
+  constructor(
+    @Inject(DATABASE_CONNECTION)
+    private readonly db: BetterSQLite3Database<typeof schema>,
+  ) {}
 
   create(createTodoDto: CreateTodoDto) {
-    const newTodo: Todo = {
-      id: this.idCounter++,
-      title: createTodoDto.title,
-      description: createTodoDto.description,
-      isCompleted: false,
-    };
-    this.todos.push(newTodo);
-    return newTodo;
+    const result = this.db
+      .insert(todos)
+      .values({
+        title: createTodoDto.title,
+        description: createTodoDto.description,
+      })
+      .returning()
+      .get();
+    return result;
   }
 
   findAll() {
-    return this.todos;
+    return this.db.select().from(todos).all();
   }
 
   findOne(id: number) {
-    const todo = this.todos.find((t) => t.id === id);
+    const todo = this.db.select().from(todos).where(eq(todos.id, id)).get();
     if (!todo) {
       throw new NotFoundException(`Todo with ID ${id} not found`);
     }
@@ -32,21 +39,31 @@ export class TodoService {
   }
 
   update(id: number, updateTodoDto: UpdateTodoDto) {
-    const todo = this.findOne(id);
-    if (updateTodoDto.title !== undefined) todo.title = updateTodoDto.title;
-    if (updateTodoDto.description !== undefined)
-      todo.description = updateTodoDto.description;
-    if (updateTodoDto.isCompleted !== undefined)
-      todo.isCompleted = updateTodoDto.isCompleted;
+    const todo = this.db
+      .update(todos)
+      .set({
+        title: updateTodoDto.title,
+        description: updateTodoDto.description,
+        isCompleted: updateTodoDto.isCompleted,
+      })
+      .where(eq(todos.id, id))
+      .returning()
+      .get();
+    if (!todo) {
+      throw new NotFoundException(`Todo with ID ${id} not found`);
+    }
     return todo;
   }
 
   remove(id: number) {
-    const index = this.todos.findIndex((t) => t.id === id);
-    if (index === -1) {
+    const todo = this.db
+      .delete(todos)
+      .where(eq(todos.id, id))
+      .returning()
+      .get();
+    if (!todo) {
       throw new NotFoundException(`Todo with ID ${id} not found`);
     }
-    const removed = this.todos.splice(index, 1);
-    return removed[0];
+    return todo;
   }
 }
